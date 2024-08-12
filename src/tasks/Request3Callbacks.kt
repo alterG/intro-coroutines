@@ -5,21 +5,25 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 
 fun loadContributorsCallbacks(service: GitHubService, req: RequestData, updateResults: (List<User>) -> Unit) {
     service.getOrgReposCall(req.org).onResponse { responseRepos ->
         logRepos(req, responseRepos)
         val repos = responseRepos.bodyList()
-        val allUsers = mutableListOf<User>()
+
+        val allUsers = Collections.synchronizedList(mutableListOf<User>())
+        val latch = CountDownLatch(repos.size)
         for (repo in repos) {
             service.getRepoContributorsCall(req.org, repo.name).onResponse { responseUsers ->
                 logUsers(repo, responseUsers)
                 val users = responseUsers.bodyList()
                 allUsers += users
+                latch.countDown()
             }
         }
-        // TODO: Why this code doesn't work? How to fix that?
+        latch.await()
         updateResults(allUsers.aggregate())
     }
 }
