@@ -4,5 +4,19 @@ import contributors.*
 import kotlinx.coroutines.*
 
 suspend fun loadContributorsConcurrent(service: GitHubService, req: RequestData): List<User> = coroutineScope {
-    TODO()
+    val repos = service
+        .getOrgRepos(req.org) // Executes request and suspend
+        .also { logRepos(req, it) }
+        .body() ?: emptyList()
+
+    val deferred = repos.map { repo ->
+        async {
+            log("starting loading for ${repo.name}")
+            service
+                .getRepoContributors(req.org, repo.name) // Executes request and suspend
+                .also { logUsers(repo, it) }
+                .bodyList()
+        }
+    }
+    deferred.awaitAll().flatten().aggregate()
 }
