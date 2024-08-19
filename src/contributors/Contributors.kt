@@ -125,6 +125,7 @@ interface Contributors: CoroutineScope {
         startTime: Long,
         completed: Boolean = true
     ) {
+        log("update results!")
         updateContributors(users)
         updateLoadingStatus(if (completed) COMPLETED else IN_PROGRESS, startTime)
         if (completed) {

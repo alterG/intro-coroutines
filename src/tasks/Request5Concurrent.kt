@@ -12,6 +12,7 @@ suspend fun loadContributorsConcurrent(service: GitHubService, req: RequestData)
     val deferred = repos.map { repo ->
         async {
             log("starting loading for ${repo.name}")
+            // delay(3000)
             service
                 .getRepoContributors(req.org, repo.name) // Executes request and suspend
                 .also { logUsers(repo, it) }

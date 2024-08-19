@@ -18,14 +18,14 @@ suspend fun loadContributorsSuspend(service: GitHubService, req: RequestData): L
     }.aggregate()
 }
 
-fun main() = runBlocking {
-    val deferredList: List<Deferred<Int>> = (1..3).map {
-        async {
-            delay(1000L*it)
-            log("$it")
-            it
-        }
-    }
-    deferredList.awaitAll().forEach { log("meow $it") }
-    log("All done")
-}
+//fun main() = runBlocking {
+//    val deferredList: List<Deferred<Int>> = (1..3).map {
+//        async {
+//            delay(1000L*it)
+//            log("$it")
+//            it
+//        }
+//    }
+//    deferredList.awaitAll().forEach { log("meow $it") }
+//    log("All done")
+//}
